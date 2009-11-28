@@ -40,15 +40,10 @@ function printc(x,c,w) {
     if (typeof x == "object") { x = $.toJSON(x)} 
     $('body').append($("<div style = 'border: "+w+"px solid "+c+";'>" + x + "</div>"))
 }
-function is_string_value(str) {
-    return str.substr(0,1) == "'";
-}
-function get_string_value(val) {
-    return val.substr(1,val.length-1)
-}
+
 function ev(code) {
     var scope = {
-        'lazies' : {'def':0,'set':0,'comment': 0},
+        'lazies' : {'def':0,'set':0,'comment': 0, 'str': 0},
         'empty' : function(args) {
             return;
         },
@@ -59,6 +54,7 @@ function ev(code) {
             return ret;
         },
         'call' : function(args){
+            printc(args, 'red', 5)
             var func = this.lookup(args[0]) || this.empty;
             //printc(args[0],'green',4)
             //lazy eval later
@@ -66,18 +62,15 @@ function ev(code) {
                 var val
                 for (var i in args[1]){
                     val = args[1][i];
-                    if (typeof val == 'string') {
-                        if (is_string_value(val)) { //that means it is a string;
-                            args[1][i] = get_string_value(val);
-                        } else {
-                            args[1][i] = this.lookup(val);
-                        }
+                    args[1][i] = this.lookup(val);
                     } else if (typeof val == "object") {
                         args[1][i] = this.read_eval(val)
                     }
                 }
             }
-            return func(args[1])
+            var ret = func(args[1])
+            printc(ret, 'purple', 2)
+            return ret
         },
         'lookup' : function(args) {
             if (typeof args == "object") {
@@ -129,6 +122,12 @@ function ev(code) {
         },
         'get-scope' : function(){
             return this; //??
+        },
+        "str" : function(arg) {
+            printc(arg, 'gray')
+            var ret = arg.join("")
+            printc(ret, 'green')
+            return ret
         }
         
         
@@ -212,6 +211,10 @@ function parse(str){
 </head>
 <body>
     <drewby>
+    (print "test")
+    </drewby>
+    
+    <other>
     (print "hello world")
     (print (concat "yo" ":dude"))
     (set a "ten")
@@ -222,7 +225,7 @@ function parse(str){
         (print "and")
         (print b) 
     )
-    </drewby>
+    </other>
     
     <next>
     (comment 
