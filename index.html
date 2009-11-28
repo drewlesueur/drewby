@@ -47,26 +47,29 @@ function ev(code) {
         'empty' : function(args) {
             return;
         },
-        'read_eval' : function(exp) {
-            var func_name = exp[0]; //func name is first one
-            var args = exp.splice(1, exp.length - 1)
-            var ret = scope.call([func_name, args])
-            return ret;
-        },
+        
         'call' : function(args){
+            
+           //not done. this is where you left off
             printc(args, 'red', 5)
-            var func = this.lookup(args[0]) || this.empty;
-            //printc(args[0],'green',4)
-            //lazy eval later
-            if (!(args[0] in this.lazies)) { 
-                var val
-                for (var i in args[1]){
-                    val = args[1][i];
-                    args[1][i] = this.lookup(val);
-                    } else if (typeof val == "object") {
-                        args[1][i] = this.read_eval(val)
+            if (typeof args == "object") {
+                var func_exp = exp[0]; //func name is first one
+                var func_args = exp.splice(1, exp.length - 1)
+                var func = this.call(func_exp) || this.empty;
+                //printc(args[0],'green',4)
+                //lazy eval later
+                if (!(func_exp in this.lazies)) { 
+                    var val
+                    for (var i in args[1]){
+                        val = args[1][i];
+                        args[1][i] = this.call(val);
+                        } else if (typeof val == "object") {
+                            args[1][i] = this.read_eval(val)
+                        }
                     }
                 }
+            } else {
+                return this.lookup(args)
             }
             var ret = func(args[1])
             printc(ret, 'purple', 2)
@@ -136,7 +139,7 @@ function ev(code) {
     
     for (var i = 0; i < code.length; i++) {
         var exp = code[i]
-        scope.read_eval(exp);
+        scope.call(exp);
     }
     //(a-str call deff set if lookup a o)
     
