@@ -37,7 +37,7 @@ function parse(str){
                 print_out(scope.state, scope.exp, scope.val, scope.chr, scope.level)
                 //return scope.exp
                 scope.state = "possible close"
-            } else if (scope.chr == '"' || scope.chr == "'") {
+            } else if (scope.chr == '"') {//|| scope.chr == "'") {
                 if (scope.val.length == 0) {
                     scope.state = "quote"
                     scope.quote_type = scope.chr
@@ -53,6 +53,8 @@ function parse(str){
                     i = end + (('"' + search).length  - 1)
                     scope.exp.push(['str', the_string])
                 } 
+            } else if (scope.chr == "'") {
+                scope.single_quoted = true;
             }
         } else if (scope.state == "possible close") {
             //return scope.exp
@@ -62,6 +64,12 @@ function parse(str){
                 scope.exp = (parse2({state:"symbol", exp:[scope.exp], val:[], chr:arr[i], level: scope.level + 1}))   
                 scope.state = "symbol"            
             } else {
+                if (scope.single_quoted && scope.single_quoted == true) {
+                    scope.single_quoted = false;
+                    return ['quote', scope.exp]                
+                }
+               
+                console.log('not single quoted')
                 return scope.exp  //change this for text right after
             }
         } else if (scope.state == "quote") {
