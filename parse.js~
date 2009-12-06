@@ -63,12 +63,14 @@ function parse(str){
                 i++
                 scope.exp = (parse2({state:"symbol", exp:[scope.exp], val:[], chr:arr[i], level: scope.level + 1}))   
                 scope.state = "symbol"            
+            } else if (is_symbol(scope.chr)) {                
+                scope.val.push(scope.chr);
+                scope.state = 'symbol' //hope this works
             } else {
                 if (scope.single_quoted && scope.single_quoted == true) {
                     scope.single_quoted = false;
                     return ['quote', scope.exp]                
                 }
-                alert(scope.single_quoted)
                 console.log('not single quoted')
                 return scope.exp  //change this for text right after
             }
