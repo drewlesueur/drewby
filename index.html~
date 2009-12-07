@@ -18,7 +18,9 @@ $(document).ready(function(){
 </head>
 <body>
     <drewby>
-    ((print).yo)too
+    (print)test
+    (take)"that"
+
     </drewby>
     todo: add unindented strings
 

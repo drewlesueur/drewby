@@ -67,6 +67,9 @@ function parse(str){
                 scope.val.push(scope.chr);
                 scope.exp = [scope.exp]
                 scope.state = 'symbol' //hope this works
+            } else if (scope.chr == '"') {
+                scope.state = "quote"
+                scope.quote_type = scope.chr
             } else {
                 if (scope.single_quoted && scope.single_quoted == true) {
                     scope.single_quoted = false;
