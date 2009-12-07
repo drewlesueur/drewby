@@ -24,6 +24,9 @@ function parse(str){
                     scope.val = []
                     i++
                     scope.exp.push(parse2({state:"symbol", exp:[beg], val:[], chr:arr[i], level: scope.level + 1}))
+                } else if (scope.ya_exp && (typeof scope.ya_exp == "object")) {
+                    i++
+                    return (parse2({state:"symbol", exp:[scope.ya_exp], val:[], chr:arr[i], level: scope.level + 1}))                  
                 } else {
                     i++
                     scope.exp.push(parse2({state:"symbol", exp:[], val:[], chr:arr[i], level: scope.level + 1}))
@@ -44,7 +47,6 @@ function parse(str){
                 } else { //we have a special quotation thing going on 
                     var search = scope.val.join('');
                     scope.val = [];
-                    
                     var end = str.indexOf('"' + search, i+1);
                     if (end == -1) {
                         return "error! you didn't properly close your special quote";
@@ -57,31 +59,48 @@ function parse(str){
                 scope.single_quoted = true;
             }
         } else if (scope.state == "possible close") {
-            //return scope.exp
-            //closes if the this char is not a (
             if (scope.chr == "(") {
-                i++
-                scope.exp = (parse2({state:"symbol", exp:[scope.exp], val:[], chr:arr[i], level: scope.level + 1}))   
-                scope.state = "symbol"            
+                scope.ya_exp = scope.exp
+                scope.exp = []
+                i--;
+                scope.state = "symbol"              
+                //old way                
+                //i++
+                //return (parse2({state:"symbol", exp:[scope.exp], val:[], chr:arr[i], level: scope.level + 1}))   
             } else if (is_symbol(scope.chr)) {                
                 scope.val.push(scope.chr);
                 scope.exp = [scope.exp]
                 scope.state = 'symbol' //hope this works
             } else if (scope.chr == '"') {
-                console.log("got to quote")
+                scope.state = "quote"
+                scope.quote_type = scope.chr
             } else {
                 if (scope.single_quoted && scope.single_quoted == true) {
                     scope.single_quoted = false;
                     return ['quote', scope.exp]                
                 }
                 console.log('not single quoted')
+                console.log(arr[i+1])                
                 return scope.exp  //change this for text right after
             }
-        } else if (scope.state == "quote") {
-            if (scope.chr == scope.quote_type) {
+        } else if (scope.state == "possible close quote") {
+            if (scope.chr == "(") {
+                i++
+                scope.exp = (parse2({state:"symbol", exp:[scope.exp], val:[], chr:arr[i], level: scope.level + 1}))   
+                return scope.exp
+            } else if (scope.chr == '"') {
+                console.log("whateever")
+            } else {
                 scope.exp.push(["str",scope.val.join('')])
                 scope.val = []
                 scope.state = "symbol"
+            }
+        } else if (scope.state == "quote") {
+            if (scope.chr == scope.quote_type) {
+                //scope.exp.push(["str",scope.val.join('')])
+                //scope.val = []
+                //scope.state = "symbol"
+                scope.state = "possible close quote"
             } else if (scope.chr == "\\"){
                 scope.state = "quote-escape"
             } else {
