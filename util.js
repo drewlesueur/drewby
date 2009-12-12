@@ -1,6 +1,26 @@
+//AUTOFEATURE=true ./script/autospec
 function is_symbol(str) {
-    return "( )'\"\u000a\r\n".indexOf(str) == -1;
+    return "( )'\"\u000a\r\n#;".indexOf(str) == -1;
 }
+function find_either(needles, str, index) {
+    var spot = str.length
+    var needle;
+    var tempspot;
+    for (var n in needles) {
+        needle = needles[n]
+        tempspot = str.indexOf(str, index)
+        if (tempspot >= -1) {        
+            if (n == 0) {
+                var spot = tempspot        
+            } else if (tempspot < spot) {
+                var spot = tempspot        
+            }
+        }
+    }
+    
+    return spot;
+}
+
 function is_space(chr) {
     return "\n\r\t\u000a ".indexOf(chr) != -1
 }

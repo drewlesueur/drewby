@@ -25,6 +25,7 @@ function parse(str){
                     i++
                     scope.exp.push(parse2({state:"symbol", exp:[beg], val:[], chr:arr[i], level: scope.level + 1}))
                 } else if (scope.ya_exp && (typeof scope.ya_exp == "object")) {
+                    console.log('got here')
                     i++
                     return (parse2({state:"symbol", exp:[scope.ya_exp], val:[], chr:arr[i], level: scope.level + 1}))                  
                 } else {
@@ -57,6 +58,9 @@ function parse(str){
                 } 
             } else if (scope.chr == "'") {
                 scope.single_quoted = true;
+            } else if (scope.chr == ";") {
+                //i = find_either(['\n','\r'], str, i);
+                
             }
         } else if (scope.state == "possible close") {
             if (scope.chr == "(") {
@@ -88,9 +92,10 @@ function parse(str){
                 
             } else if (scope.chr == '"') {
                 console.log("whateever")
+            } else if (is_symbol(scope.chr)) {
+
             } else {
                 i--
-                
             }
         } else if (scope.state == "quote") {
             if (scope.chr == scope.quote_type) {
@@ -126,6 +131,9 @@ function parse(str){
             return scope.exp
         }
         scope.chr = arr[i]
+        if ('terminate' in scope) {
+            return scope.exps        
+        }
         return parse2(scope) //this could be implemented iteratively easily.
     }
 }
